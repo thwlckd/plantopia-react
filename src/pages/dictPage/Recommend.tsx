@@ -5,6 +5,7 @@ import { Pagination, Navigation } from 'swiper/modules';
 import { targetClassName, targetQuery } from '@/constants/dictionary';
 import { useRecommend } from '@/hooks';
 import Progress from '@/components/progress/Progress';
+import REFRESH from '@/assets/images/icons/dict_refresh.png';
 import './recommend.scss';
 
 interface RecommendProps {
@@ -14,7 +15,12 @@ interface RecommendProps {
 }
 
 const Recommend = ({ icon, title, target }: RecommendProps) => {
-  const { data: plant, isLoading } = useRecommend({ target });
+  const { data: plant, isLoading, refetch } = useRecommend({ target });
+
+  const onClickRefreshBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    refetch();
+  };
 
   return (
     <div className="recommend_container">
@@ -23,6 +29,9 @@ const Recommend = ({ icon, title, target }: RecommendProps) => {
           <img className="plant_icon" src={icon} alt="search icon" />
         </div>
         <span>{title}</span>
+        <button onClick={onClickRefreshBtn}>
+          <img src={REFRESH} />
+        </button>
       </div>
       <Swiper
         slidesPerView={target === 'beginner' ? 2 : 3}

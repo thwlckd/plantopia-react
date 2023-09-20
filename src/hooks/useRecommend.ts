@@ -36,18 +36,17 @@ const getDouments = async (target: keyof typeof targetQuery) => {
 };
 
 const useRecommend = ({ target }: UseRecommendProps) => {
-  const { data, isLoading } = useQuery(
+  const { data, isLoading, refetch } = useQuery(
     ['recommend', target],
     () => getDouments(target),
     {
-      cacheTime: Infinity,
-      staleTime: Infinity,
+      staleTime: 300000,
       refetchOnWindowFocus: false,
       onSuccess: data => data && shuffleArray(data),
     },
   );
 
-  return { data, isLoading };
+  return { data, isLoading, refetch };
 };
 
 export default useRecommend;

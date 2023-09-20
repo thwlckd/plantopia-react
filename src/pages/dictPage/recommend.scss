@@ -29,6 +29,7 @@
   padding-top: 1.5rem;
 
   .title_wrapper {
+    position: relative;
     display: flex;
     padding: 0 2rem;
     color: #22264c;
@@ -64,6 +65,7 @@
       font-weight: 700;
       font-size: 1.4rem;
       line-height: 3.2rem;
+      flex-grow: 1;
     }
   }
 
