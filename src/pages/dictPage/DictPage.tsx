@@ -1,11 +1,10 @@
-import { useState, useRef, Children } from 'react';
+import { useRef, Children } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recommend } from '@/constants/dictionary';
 import { useAuth } from '@/hooks';
 import Recommend from './Recommend';
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
-import Progress from '@/components/progress/Progress';
 import SEARCH_ICON from '@/assets/images/icons/dict_search.png';
 import './dictPage.scss';
 
@@ -13,7 +12,6 @@ const DictPage = () => {
   const user = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -47,17 +45,11 @@ const DictPage = () => {
         </section>
         {Children.toArray(
           recommend.map(({ icon, title, target }) => (
-            <Recommend
-              icon={icon}
-              title={title}
-              target={target}
-              setIsLoading={setIsLoading}
-            />
+            <Recommend icon={icon} title={title} target={target} />
           )),
         )}
       </main>
       <Footer />
-      {isLoading && <Progress />}
     </div>
   );
 };

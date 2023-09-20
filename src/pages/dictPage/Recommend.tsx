@@ -4,17 +4,17 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
 import { targetClassName, targetQuery } from '@/constants/dictionary';
 import { useRecommend } from '@/hooks';
+import Progress from '@/components/progress/Progress';
 import './recommend.scss';
 
 interface RecommendProps {
   icon: string;
   title: string;
   target: keyof typeof targetQuery;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Recommend = ({ icon, title, target, setIsLoading }: RecommendProps) => {
-  const { plant } = useRecommend({ target, setIsLoading });
+const Recommend = ({ icon, title, target }: RecommendProps) => {
+  const { data: plant, isLoading } = useRecommend({ target });
 
   return (
     <div className="recommend_container">
@@ -66,6 +66,7 @@ const Recommend = ({ icon, title, target, setIsLoading }: RecommendProps) => {
           )),
         )}
       </Swiper>
+      {isLoading && <Progress />}
     </div>
   );
 };
