@@ -35,7 +35,7 @@ const getDouments = async (target: keyof typeof targetQuery) => {
   return queriedData;
 };
 
-const useRecommend = ({ target }: UseRecommendProps) => {
+const useRecommendData = ({ target }: UseRecommendProps) => {
   const { data, isLoading, refetch } = useQuery(
     ['recommend', target],
     () => getDouments(target),
@@ -49,4 +49,4 @@ const useRecommend = ({ target }: UseRecommendProps) => {
   return { data, isLoading, refetch };
 };
 
-export default useRecommend;
+export default useRecommendData;
