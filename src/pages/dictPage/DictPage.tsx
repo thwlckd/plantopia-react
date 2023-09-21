@@ -1,4 +1,4 @@
-import { useRef, Children } from 'react';
+import { Children, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recommend } from '@/constants/dictionary';
 import { useAuth } from '@/hooks';
@@ -10,14 +10,14 @@ import './dictPage.scss';
 
 const DictPage = () => {
   const user = useAuth();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [searchInput, setSearchInput] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     navigate('/dict/search', {
       state: {
-        inputValue: inputRef?.current?.value,
+        inputValue: searchInput,
       },
     });
   };
@@ -32,7 +32,11 @@ const DictPage = () => {
         <section className="search_wrapper">
           <form onSubmit={handleSubmit}>
             <div className="input_wrapper">
-              <input ref={inputRef} placeholder="식물 이름으로 검색하기" />
+              <input
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
+                placeholder="식물 이름으로 검색하기"
+              />
               <button>
                 <img
                   className="search_img"

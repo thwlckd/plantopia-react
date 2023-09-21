@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, Children } from 'react';
+import { useState, useEffect, Children } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { db } from '@/firebaseApp';
 import { PlantType } from '@/@types/dictionary.type';
@@ -18,15 +18,13 @@ import './dictSearchPage.scss';
 
 const DictSearchPage = () => {
   const location = useLocation();
-  const inputValue = location.state?.inputValue;
+  const [searchInput, setSearchInput] = useState(location.state?.inputValue);
   const [plant, setPlant] = useState<PlantType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputRef?.current?.value) return;
-    getDouments(inputRef?.current?.value);
+    getDouments(searchInput);
   };
 
   const getDouments = async (plantName: string) => {
@@ -56,9 +54,11 @@ const DictSearchPage = () => {
     setIsLoading(false);
   };
 
+  console.log(searchInput);
+
   useEffect(() => {
-    getDouments(inputValue);
-  }, [inputValue]);
+    getDouments(searchInput);
+  }, []);
 
   return (
     <div className="search_container layout">
@@ -68,8 +68,8 @@ const DictSearchPage = () => {
           <form onSubmit={handleSubmit}>
             <div className="input_wrapper">
               <input
-                ref={inputRef}
-                defaultValue={inputValue}
+                value={searchInput}
+                onChange={e => setSearchInput(e.target.value)}
                 placeholder="식물 이름으로 검색하기"
               />
               <button>
@@ -98,7 +98,7 @@ const DictSearchPage = () => {
                 </Link>
               )),
             )
-          ) : inputValue ? (
+          ) : searchInput ? (
             <div className="no_search">
               <p>검색 결과가 없습니다.</p>
               <div className="notice">
