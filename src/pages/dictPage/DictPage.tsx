@@ -2,7 +2,7 @@ import { Children, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { recommend } from '@/constants/dictionary';
 import { useAuth } from '@/hooks';
-import Recommend from './Recommend';
+import RecommendCategory from './RecommendCategory';
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
 import SEARCH_ICON from '@/assets/images/icons/dict_search.png';
@@ -49,7 +49,7 @@ const DictPage = () => {
         </section>
         {Children.toArray(
           recommend.map(({ icon, title, target }) => (
-            <Recommend icon={icon} title={title} target={target} />
+            <RecommendCategory icon={icon} title={title} target={target} />
           )),
         )}
       </main>
