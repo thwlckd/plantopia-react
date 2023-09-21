@@ -17,7 +17,7 @@ interface RecommendProps {
 const RecommendCategory = ({ icon, title, target }: RecommendProps) => {
   const { data: plant, isLoading, refetch } = useRecommendData({ target });
 
-  const onClickRefreshBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickRefreshBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     refetch();
   };
@@ -29,7 +29,7 @@ const RecommendCategory = ({ icon, title, target }: RecommendProps) => {
           <img className="plant_icon" src={icon} alt="search icon" />
         </div>
         <span>{title}</span>
-        <button onClick={onClickRefreshBtn}>
+        <button onClick={handleClickRefreshBtn}>
           <img src={REFRESH} />
         </button>
       </div>
