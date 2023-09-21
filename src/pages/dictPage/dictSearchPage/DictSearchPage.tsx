@@ -1,16 +1,6 @@
-import { useState, useRef, useEffect, Children } from 'react';
+import { Children, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { db } from '@/firebaseApp';
-import { PlantType } from '@/@types/dictionary.type';
-import { koreanRe } from '@/constants/regEx';
-import {
-  collection,
-  getDocs,
-  query,
-  startAt,
-  endAt,
-  orderBy,
-} from 'firebase/firestore';
+import { useSearchData } from '@/hooks';
 import Progress from '@/components/progress/Progress';
 import HeaderBefore from '@/components/headerBefore/HeaderBefore';
 import SEARCH_ICON from '@/assets/images/icons/dict_search.png';
@@ -18,47 +8,18 @@ import './dictSearchPage.scss';
 
 const DictSearchPage = () => {
   const location = useLocation();
-  const inputValue = location.state?.inputValue;
-  const [plant, setPlant] = useState<PlantType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputValue = location.state.inputValue;
+  const inputRef = useRef<HTMLInputElement>(inputValue);
+  const {
+    data: plant,
+    isLoading,
+    refetch,
+  } = useSearchData(inputRef.current?.value);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputRef?.current?.value) return;
-    getDouments(inputRef?.current?.value);
+    refetch();
   };
-
-  const getDouments = async (plantName: string) => {
-    setPlant([]);
-    setIsLoading(true);
-    let fieldName = 'name';
-    if (!koreanRe.test(plantName)) {
-      fieldName = 'scientificName';
-      plantName =
-        plantName[0] &&
-        plantName.replace(plantName[0], plantName[0].toUpperCase());
-    }
-    const dictRef = collection(db, 'dictionary');
-    const q = query(
-      dictRef,
-      orderBy(fieldName),
-      startAt(`${plantName}`),
-      endAt(`${plantName}\uf8ff`),
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach(doc => {
-      setPlant(prev => {
-        const data = doc.data();
-        return [...prev, data] as PlantType[];
-      });
-    });
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    getDouments(inputValue);
-  }, [inputValue]);
 
   return (
     <div className="search_container layout">
@@ -83,7 +44,7 @@ const DictSearchPage = () => {
           </form>
         </section>
         <section className="plant_container">
-          {plant.length ? (
+          {plant?.length ? (
             Children.toArray(
               plant.map(item => (
                 <Link to={`/dict/detail?plantName=${item.name}`} state={item}>
@@ -98,7 +59,7 @@ const DictSearchPage = () => {
                 </Link>
               )),
             )
-          ) : inputValue ? (
+          ) : inputRef.current?.value ? (
             <div className="no_search">
               <p>검색 결과가 없습니다.</p>
               <div className="notice">

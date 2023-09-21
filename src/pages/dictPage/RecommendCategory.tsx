@@ -3,18 +3,24 @@ import { Link } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Navigation } from 'swiper/modules';
 import { targetClassName, targetQuery } from '@/constants/dictionary';
-import { useRecommend } from '@/hooks';
+import { useRecommendData } from '@/hooks';
+import Progress from '@/components/progress/Progress';
+import REFRESH from '@/assets/images/icons/dict_refresh.png';
 import './recommend.scss';
 
 interface RecommendProps {
   icon: string;
   title: string;
   target: keyof typeof targetQuery;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Recommend = ({ icon, title, target, setIsLoading }: RecommendProps) => {
-  const { plant } = useRecommend({ target, setIsLoading });
+const RecommendCategory = ({ icon, title, target }: RecommendProps) => {
+  const { data: plant, isLoading, refetch } = useRecommendData({ target });
+
+  const handleClickRefreshBtn = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    refetch();
+  };
 
   return (
     <div className="recommend_container">
@@ -23,6 +29,9 @@ const Recommend = ({ icon, title, target, setIsLoading }: RecommendProps) => {
           <img className="plant_icon" src={icon} alt="search icon" />
         </div>
         <span>{title}</span>
+        <button onClick={handleClickRefreshBtn}>
+          <img src={REFRESH} />
+        </button>
       </div>
       <Swiper
         slidesPerView={target === 'beginner' ? 2 : 3}
@@ -66,8 +75,9 @@ const Recommend = ({ icon, title, target, setIsLoading }: RecommendProps) => {
           )),
         )}
       </Swiper>
+      {isLoading && <Progress />}
     </div>
   );
 };
 
-export default Recommend;
+export default RecommendCategory;

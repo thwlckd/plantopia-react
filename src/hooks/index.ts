@@ -1,4 +1,5 @@
-import useRecommend from './useRecommend';
+import useRecommendData from './useRecommendData';
+import useSearchData from './useSearchData';
 import useAuth from './useAuth';
 
-export { useAuth, useRecommend };
+export { useAuth, useRecommendData, useSearchData };
