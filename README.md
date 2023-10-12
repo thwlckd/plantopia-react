@@ -2,6 +2,9 @@
 
 - 슬기로운 식물 관리의 시작
 - 🚗 https://plant-utopia.vercel.app/
+- 테스트계정
+  - id: `test@test.com`
+  - pw: `test1234`
 
 ## 🌵 프로젝트 주제 및 기획 <a href="https://github.com/thwlckd/plantopia-react/files/12520115/7._.pptx">PPT 발표 자료</a>
 
