@@ -85,7 +85,7 @@ master
 ## 🎨 협업 툴
 
 - [Figma](https://www.figma.com/file/NpxLwqcttC04Tx25FNU0Z2): 와이어프레임, 디자인
-- [Notion](https://hyub.notion.site/ede7d2e7f3a042c3b8481fc31abd192f?pvs=4) : 팀 페이지, 프로젝트 일정/현황 관리, 스크럼/문서 정리
+- [Notion](https://hyub.notion.site/Plantopia-ede7d2e7f3a042c3b8481fc31abd192f?pvs=4) : 팀 페이지, 프로젝트 일정/현황 관리, 스크럼/문서 정리
 - [Gitlab](https://kdt-gitlab.elice.io/sw_track/class_05/web_2_project/team07/front-end) : Project Repository
 - Gather, Discord: 팀 커뮤니케이션
 - Elice 강의실(Zoom 대용): 담당 코치님들의 오피스아워(코칭)
