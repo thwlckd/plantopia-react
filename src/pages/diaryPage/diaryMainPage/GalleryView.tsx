@@ -1,26 +1,21 @@
-import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { DiaryProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
+
 import NoContent from './NoContent';
 import './galleryView.scss';
 
 interface GalleryViewProps {
-  diaryData: DiaryProps[];
+  diaryData: Diary[] | undefined;
 }
 
-const GalleryView: React.FC<GalleryViewProps> = ({ diaryData }) => {
-  const cardRefs = useRef<HTMLDivElement[]>([]);
-
+const GalleryView = ({ diaryData }: GalleryViewProps) => {
   const getMainImage = (imgUrls: string[]) => {
     return `url(${imgUrls[0]})`;
   };
 
   return (
     <>
-      {diaryData.length === 0 ||
-      diaryData.every(diary => diary.imgUrls.length === 0) ? (
-        <NoContent />
-      ) : (
+      {diaryData ? (
         <div className="gallery_view">
           {diaryData.map((diary, index) => (
             <Link
@@ -30,13 +25,11 @@ const GalleryView: React.FC<GalleryViewProps> = ({ diaryData }) => {
               className={`card ${
                 diary.imgUrls.length === 0 ? 'hide' : 'show'
               } ${diary.imgUrls.length > 1 ? 'many' : ''}`}
-            >
-              <div
-                ref={cardElement => (cardRefs.current[index] = cardElement!)}
-              ></div>
-            </Link>
+            />
           ))}
         </div>
+      ) : (
+        <NoContent />
       )}
     </>
   );
