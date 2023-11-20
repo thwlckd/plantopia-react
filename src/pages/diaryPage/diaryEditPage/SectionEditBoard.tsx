@@ -35,9 +35,9 @@ const SectionEditBoard = ({
             </div>
           ) : (
             <div className="chosen_wrap">
-              {chosenPlants.map(plant => (
+              {chosenPlants.map((plant, index) => (
                 <div
-                  key={plant}
+                  key={index}
                   className="chosen_plant"
                   onClick={() => handleChosenPlantClick(plant)}
                 >

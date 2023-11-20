@@ -5,7 +5,7 @@ import NoContent from './NoContent';
 import './galleryView.scss';
 
 interface GalleryViewProps {
-  diaryData: DiaryProps[];
+  diaryData: DiaryProps[] | undefined;
 }
 
 const GalleryView = ({ diaryData }: GalleryViewProps) => {
@@ -15,10 +15,7 @@ const GalleryView = ({ diaryData }: GalleryViewProps) => {
 
   return (
     <>
-      {diaryData.length === 0 ||
-      diaryData.every(diary => diary.imgUrls.length === 0) ? (
-        <NoContent />
-      ) : (
+      {diaryData ? (
         <div className="gallery_view">
           {diaryData.map((diary, index) => (
             <Link
@@ -31,6 +28,8 @@ const GalleryView = ({ diaryData }: GalleryViewProps) => {
             />
           ))}
         </div>
+      ) : (
+        <NoContent />
       )}
     </>
   );

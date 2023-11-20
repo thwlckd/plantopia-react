@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DIARY_IMAGES } from '@/constants/diary';
-import { useAuth } from '@/hooks';
+import { useAuth, useDiaryData, usePlantData } from '@/hooks';
 import { showAlert } from '@/utils/alarmUtil';
-import useDiaryData from '@/hooks/useDiaryData';
 
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
@@ -30,9 +29,18 @@ const TAB_DATA = [
 const DiaryPage = () => {
   const user = useAuth();
   const navigate = useNavigate();
-  const { diaryData, checkPlantExistence, handleDelete, isLoading } =
-    useDiaryData();
   const [currentTab, setCurrentTab] = useState('list_tab');
+  const {
+    data: diaryData,
+    deleteDiaryItem,
+    isLoading,
+    refetch,
+  } = useDiaryData(user);
+  const { data: plantData } = usePlantData(user);
+
+  useEffect(() => {
+    user && refetch();
+  }, [user]);
 
   const handleTabChange = (tab: string) => {
     if (tab !== currentTab) {
@@ -41,8 +49,7 @@ const DiaryPage = () => {
   };
 
   const handleRedirect = async () => {
-    const plantExists = await checkPlantExistence();
-    if (!plantExists) {
+    if (!plantData) {
       showAlert(
         '등록된 식물이 없습니다.',
         '내 식물을 등록하시겠습니까?',
@@ -84,7 +91,7 @@ const DiaryPage = () => {
           </section>
           <section className="content_section">
             {currentTab === 'list_tab' ? (
-              <ListView diaryData={diaryData} handleDelete={handleDelete} />
+              <ListView diaryData={diaryData} handleDelete={deleteDiaryItem} />
             ) : (
               <GalleryView diaryData={diaryData} />
             )}

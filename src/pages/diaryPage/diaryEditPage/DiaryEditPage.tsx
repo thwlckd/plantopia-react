@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useDiaryData from '@/hooks/useDiaryData';
 import { DiaryProps } from '@/@types/diary.type';
 import { errorNoti, successNoti } from '@/utils/alarmUtil';
+import { useAuth, usePlantData } from '@/hooks';
 
 import HeaderBefore from '@/components/headerBefore/HeaderBefore';
 import SectionEditBoard from './SectionEditBoard';
@@ -11,6 +12,7 @@ import NotFoundPage from '@/pages/notFoundPage/NotFoundPage';
 import './diaryEditPage.scss';
 
 const DiaryEditPage = () => {
+  const user = useAuth();
   const { docId } = useParams();
   const navigate = useNavigate();
   const [title, setTitle] = useState('');
@@ -18,10 +20,22 @@ const DiaryEditPage = () => {
   const [chosenPlants, setChosenPlants] = useState<string[]>([]);
   const [imgUrls, setImgUrls] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
-  const { diaryData, updateDiaryData, isLoading, setIsLoading, plantTag } =
-    useDiaryData();
+  const {
+    data: diaryData,
+    updateDiaryItem,
+    isLoading,
+    refetch: diaryRefetch,
+  } = useDiaryData(user);
+  const { data: plantData, refetch: plantRefetch } = usePlantData(user);
 
-  const diaryToUpdate = diaryData.find(
+  useEffect(() => {
+    if (!user) return;
+
+    diaryRefetch();
+    plantRefetch();
+  }, [user]);
+
+  const diaryToUpdate = diaryData?.find(
     (diary: DiaryProps) => diary.id === docId,
   );
 
@@ -66,15 +80,13 @@ const DiaryEditPage = () => {
       return;
     }
 
-    setIsLoading(true);
     if (!docId) return;
-    await updateDiaryData(docId, {
+    await updateDiaryItem(docId, {
       content: content,
       tags: chosenPlants,
       title: title,
       imgUrls: imgUrls,
     });
-    setIsLoading(false);
     successNoti('수정이 완료되었어요!');
     navigate('/diary');
   };
@@ -87,12 +99,7 @@ const DiaryEditPage = () => {
     <div className="layout">
       <HeaderBefore ex={true} title="수정하기" />
       <main className="diary_write_wrap">
-        <SectionEditPhoto
-          imgUrls={imgUrls}
-          setImgUrls={setImgUrls}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
+        <SectionEditPhoto imgUrls={imgUrls} setImgUrls={setImgUrls} />
         <SectionEditBoard
           title={title}
           setTitle={setTitle}
@@ -103,7 +110,7 @@ const DiaryEditPage = () => {
           handlePlantSelection={handlePlantSelection}
           isVisible={isVisible}
           toggleSelect={toggleSelect}
-          plantTag={plantTag}
+          plantTag={plantData}
         />
         <button
           className="save_button"

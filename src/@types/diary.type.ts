@@ -13,13 +13,13 @@ export interface DiaryProps {
 
 /* 다이어리 메인 페이지 */
 export interface ListViewProps {
-  diaryData: DiaryProps[];
+  diaryData: DiaryProps[] | undefined;
   handleDelete: (diaryId: string) => void;
 }
 
 /* 상세페이지 */
 export interface DiaryDetailProps {
-  diaryData: DiaryProps[];
+  diaryData: DiaryProps[] | undefined;
   handleDelete: (diaryId: string) => void;
 }
 
@@ -62,5 +62,5 @@ export interface SectionEditBoardProps {
   handlePlantSelection: (event: React.ChangeEvent<HTMLInputElement>) => void;
   isVisible: boolean;
   toggleSelect: () => void;
-  plantTag: Plant[];
+  plantTag: Plant[] | undefined;
 }

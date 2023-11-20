@@ -14,15 +14,9 @@ import './sectionEditPhoto.scss';
 interface EditPhotoProps {
   imgUrls: string[];
   setImgUrls: React.Dispatch<React.SetStateAction<string[]>>;
-  isLoading: boolean;
-  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SectionEditPhoto = ({
-  imgUrls,
-  setImgUrls,
-  setIsLoading,
-}: EditPhotoProps) => {
+const SectionEditPhoto = ({ imgUrls, setImgUrls }: EditPhotoProps) => {
   const [previewImgs, setPreviewImgs] = useState<{ backgroundImage: string }[]>(
     [],
   );
@@ -36,7 +30,6 @@ const SectionEditPhoto = ({
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setIsLoading(true);
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -56,8 +49,6 @@ const SectionEditPhoto = ({
     if (event.target instanceof HTMLInputElement) {
       event.target.value = '';
     }
-
-    setIsLoading(false);
   };
 
   const cleanFileName = (fileName: string) => {
@@ -66,7 +57,6 @@ const SectionEditPhoto = ({
   };
 
   const handleDeleteFile = async (index: number) => {
-    setIsLoading(true);
     const imageUrlToDelete = imgUrls[index];
     const fileName = getImageFileName(imageUrlToDelete);
     const imageRef = ref(storage, fileName);
@@ -82,7 +72,6 @@ const SectionEditPhoto = ({
     } catch (error) {
       return;
     }
-    setIsLoading(false);
   };
 
   const getImageFileName = (imageUrl: string) => {

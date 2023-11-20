@@ -4,8 +4,7 @@ import { DiaryProps } from '@/@types/diary.type';
 import { showAlert } from '@/utils/alarmUtil';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import { db } from '@/firebaseApp';
-import { doc, getDoc } from 'firebase/firestore';
+import { useAuth } from '@/hooks';
 import useDiaryData from '@/hooks/useDiaryData';
 
 import HeaderBefore from '@/components/headerBefore/HeaderBefore';
@@ -13,38 +12,43 @@ import NotFoundPage from '@/pages/notFoundPage/NotFoundPage';
 import './diaryDetailPage.scss';
 
 const DiaryDetailPage = () => {
+  const user = useAuth();
   const { docId } = useParams();
+  const navigate = useNavigate();
   const slideSectionPrevBtn = useRef<HTMLDivElement>(null);
   const slideSectionNextBtn = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [diaryDetailData, setDiaryDetailData] = useState<DiaryProps | null>(
-    null,
-  );
-  const { handleDelete } = useDiaryData();
+  const [diaryItem, setDiaryItem] = useState<DiaryProps>();
+  const { data, deleteDiaryItem } = useDiaryData(user);
 
-  const closeModal = () => {
+  useEffect(() => {
+    setDiaryItem(data?.find(diary => diary.id == docId));
+    // const fetchDiaryDetailData = async () => {
+    //   if (!docId) return;
+
+    //   const docRef = doc(db, 'diary', docId);
+    //   const docSnap = await getDoc(docRef);
+    //   if (docSnap.exists()) {
+    //     setDiaryItem(docSnap.data() as DiaryProps);
+    //   }
+    // };
+
+    // fetchDiaryDetailData();
+  }, []);
+
+  const handleUpdatePost = () => {
+    navigate(`/diary/${docId}/edit`);
     setIsModalOpen(false);
   };
 
-  const navigateToEdit = () => {
-    navigate(`/diary/${docId}/edit`);
-    closeModal();
+  const handleDeletePost = () => {
+    if (!docId) return;
+
+    showAlert('글을 삭제하시겠습니까?', '', async () => {
+      await deleteDiaryItem(docId);
+      setIsModalOpen(false);
+    });
   };
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchDiaryDetailData = async () => {
-      if (!docId) return;
-      const docRef = doc(db, 'diary', docId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setDiaryDetailData(docSnap.data() as DiaryProps);
-      }
-    };
-
-    fetchDiaryDetailData();
-  }, [docId]);
 
   if (!docId) {
     return <NotFoundPage />;
@@ -62,18 +66,10 @@ const DiaryDetailPage = () => {
         ></button>
         {isModalOpen && (
           <div className="more_modal">
-            <div className="btn modify" onClick={navigateToEdit}>
+            <div className="btn modify" onClick={handleUpdatePost}>
               게시글 수정
             </div>
-            <div
-              className="btn delete"
-              onClick={() => {
-                showAlert('글을 삭제하시겠습니까?', '', async () => {
-                  await handleDelete(docId);
-                  closeModal();
-                });
-              }}
-            >
+            <div className="btn delete" onClick={handleDeletePost}>
               삭제
             </div>
           </div>
@@ -81,64 +77,61 @@ const DiaryDetailPage = () => {
       </div>
       <main className="diary_detail_page">
         <div className="diary_detail_container">
-          {diaryDetailData &&
-            diaryDetailData.imgUrls &&
-            diaryDetailData.imgUrls.length > 0 && (
-              <section className="slide_section">
-                <Swiper
-                  className="diary_img_swiper swiper "
-                  modules={[Pagination, Navigation]}
-                  slidesPerView={1}
-                  spaceBetween={0}
-                  loop={true}
-                  pagination={{
-                    clickable: true,
-                  }}
-                  onInit={swiper => {
-                    swiper.navigation.init();
-                    swiper.navigation.update();
-                  }}
-                >
-                  {diaryDetailData.imgUrls.map((imgUrl, index) => (
-                    <SwiperSlide key={index}>
-                      <div className="slide_container">
-                        <img
-                          src={imgUrl}
-                          className="slide_img"
-                          alt="슬라이드 이미지"
-                        />
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                  <div className="swiper_nav">
-                    <div
-                      ref={slideSectionPrevBtn}
-                      className="swiper_nav_prev nav_btn"
-                    >
-                      <div className="prev_btn"></div>
+          {diaryItem && diaryItem.imgUrls && diaryItem.imgUrls.length > 0 && (
+            <section className="slide_section">
+              <Swiper
+                className="diary_img_swiper swiper "
+                modules={[Pagination, Navigation]}
+                slidesPerView={1}
+                spaceBetween={0}
+                loop={true}
+                pagination={{
+                  clickable: true,
+                }}
+                onInit={swiper => {
+                  swiper.navigation.init();
+                  swiper.navigation.update();
+                }}
+              >
+                {diaryItem.imgUrls.map((imgUrl, index) => (
+                  <SwiperSlide key={index}>
+                    <div className="slide_container">
+                      <img
+                        src={imgUrl}
+                        className="slide_img"
+                        alt="슬라이드 이미지"
+                      />
                     </div>
-                    <div
-                      ref={slideSectionNextBtn}
-                      className="swiper_nav_next nav_btn"
-                    >
-                      <div className="next_btn"></div>
-                    </div>
+                  </SwiperSlide>
+                ))}
+                <div className="swiper_nav">
+                  <div
+                    ref={slideSectionPrevBtn}
+                    className="swiper_nav_prev nav_btn"
+                  >
+                    <div className="prev_btn"></div>
                   </div>
-                </Swiper>
-              </section>
-            )}
-
+                  <div
+                    ref={slideSectionNextBtn}
+                    className="swiper_nav_next nav_btn"
+                  >
+                    <div className="next_btn"></div>
+                  </div>
+                </div>
+              </Swiper>
+            </section>
+          )}
           <section className="content_section inner">
-            <h5 className="diary_title">{diaryDetailData?.title}</h5>
+            <h5 className="diary_title">{diaryItem?.title}</h5>
             <div className="plant_list">
-              {diaryDetailData?.tags.map((tag, index) => (
+              {diaryItem?.tags.map((tag, index) => (
                 <span key={index}>{tag}</span>
               ))}
             </div>
             <div className="text_wrap">
-              <p className="diary_text">{diaryDetailData?.content}</p>
+              <p className="diary_text">{diaryItem?.content}</p>
               <p className="diary_date">
-                {diaryDetailData?.postedAt?.toDate().toLocaleDateString()}
+                {diaryItem?.postedAt?.toDate().toLocaleDateString()}
               </p>
             </div>
           </section>

@@ -30,11 +30,9 @@ const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
 
   return (
     <div className="list_view">
-      {diaryData.length === 0 ? (
-        <NoContent />
-      ) : (
-        <ul className="diary_list_wrap">
-          {diaryData.map(diary => (
+      <ul className="diary_list_wrap">
+        {diaryData ? (
+          diaryData.map(diary => (
             <li className="diary_list" key={diary.id}>
               <Link to={`/diary/${diary.id}`}>
                 <div className="left_box">
@@ -83,9 +81,11 @@ const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
                 </div>
               )}
             </li>
-          ))}
-        </ul>
-      )}
+          ))
+        ) : (
+          <NoContent />
+        )}
+      </ul>
     </div>
   );
 };
