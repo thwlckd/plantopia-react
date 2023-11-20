@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DiaryProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
 import { showAlert } from '@/utils/alarmUtil';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -18,23 +18,12 @@ const DiaryDetailPage = () => {
   const slideSectionPrevBtn = useRef<HTMLDivElement>(null);
   const slideSectionNextBtn = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [diaryItem, setDiaryItem] = useState<DiaryProps>();
+  const [diaryItem, setDiaryItem] = useState<Diary>();
   const { data, deleteDiaryItem } = useDiaryData(user);
 
   useEffect(() => {
     setDiaryItem(data?.find(diary => diary.id == docId));
-    // const fetchDiaryDetailData = async () => {
-    //   if (!docId) return;
-
-    //   const docRef = doc(db, 'diary', docId);
-    //   const docSnap = await getDoc(docRef);
-    //   if (docSnap.exists()) {
-    //     setDiaryItem(docSnap.data() as DiaryProps);
-    //   }
-    // };
-
-    // fetchDiaryDetailData();
-  }, []);
+  }, [data]);
 
   const handleUpdatePost = () => {
     navigate(`/diary/${docId}/edit`);

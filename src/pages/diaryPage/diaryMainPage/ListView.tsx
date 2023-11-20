@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { DiaryProps, ListViewProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
 import { showAlert } from '@/utils/alarmUtil';
 
 import NoContent from './NoContent';
 import './listView.scss';
 
+interface ListViewProps {
+  diaryData: Diary[] | undefined;
+  handleDelete: (diaryId: string) => void;
+}
+
 const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDiary, setSelectedDiary] = useState<DiaryProps | null>(null);
+  const [selectedDiary, setSelectedDiary] = useState<Diary | null>(null);
 
-  const handleToggleModal = (e: React.MouseEvent, diary: DiaryProps) => {
-    e.stopPropagation();
-
+  const handleToggleModal = (diary: Diary) => {
     setSelectedDiary(diary);
     setIsModalOpen(!isModalOpen);
   };
@@ -23,7 +26,7 @@ const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
     setIsModalOpen(false);
   };
 
-  const navigateToEdit = (diary: DiaryProps) => {
+  const navigateToEdit = (diary: Diary) => {
     navigate(`/diary/${diary.id}/edit`);
     closeModal();
   };
@@ -57,7 +60,7 @@ const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
               </Link>
               <button
                 className="more"
-                onClick={e => handleToggleModal(e, diary)}
+                onClick={() => handleToggleModal(diary)}
               ></button>
               {isModalOpen && selectedDiary === diary && (
                 <div className="more_modal">

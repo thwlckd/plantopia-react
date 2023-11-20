@@ -8,13 +8,14 @@ import {
 } from 'firebase/storage';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
-import './sectionPhoto.scss';
+import './sectionWritePhoto.scss';
 
-const SectionPhoto: React.FC<{
-  userEmail: string | null | undefined;
+interface SectionWritePhotoProps {
   imgUrls: string[];
   setImgUrls: React.Dispatch<React.SetStateAction<string[]>>;
-}> = ({ imgUrls, setImgUrls }) => {
+}
+
+const SectionWritePhoto = ({ imgUrls, setImgUrls }: SectionWritePhotoProps) => {
   const [previewImgs, setPreviewImgs] = useState<{ backgroundImage: string }[]>(
     [],
   );
@@ -145,4 +146,4 @@ const SectionPhoto: React.FC<{
   );
 };
 
-export default SectionPhoto;
+export default SectionWritePhoto;

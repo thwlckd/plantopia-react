@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useDiaryData from '@/hooks/useDiaryData';
-import { DiaryProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
 import { errorNoti, successNoti } from '@/utils/alarmUtil';
-import { useAuth, usePlantData } from '@/hooks';
+import { useAuth } from '@/hooks';
 
 import HeaderBefore from '@/components/headerBefore/HeaderBefore';
 import SectionEditBoard from './SectionEditBoard';
@@ -26,20 +26,15 @@ const DiaryEditPage = () => {
     isLoading,
     refetch: diaryRefetch,
   } = useDiaryData(user);
-  const { data: plantData, refetch: plantRefetch } = usePlantData(user);
 
   useEffect(() => {
     if (!user) return;
 
     diaryRefetch();
-    plantRefetch();
   }, [user]);
 
-  const diaryToUpdate = diaryData?.find(
-    (diary: DiaryProps) => diary.id === docId,
-  );
-
   useEffect(() => {
+    const diaryToUpdate = diaryData?.find((diary: Diary) => diary.id === docId);
     if (!diaryToUpdate) {
       return;
     }
@@ -48,7 +43,7 @@ const DiaryEditPage = () => {
     setContent(diaryToUpdate.content);
     setChosenPlants(diaryToUpdate.tags);
     setImgUrls(diaryToUpdate.imgUrls);
-  }, [diaryToUpdate]);
+  }, [diaryData]);
 
   const toggleSelect = () => {
     setIsVisible(prevVisible => !prevVisible);
@@ -110,7 +105,6 @@ const DiaryEditPage = () => {
           handlePlantSelection={handlePlantSelection}
           isVisible={isVisible}
           toggleSelect={toggleSelect}
-          plantTag={plantData}
         />
         <button
           className="save_button"

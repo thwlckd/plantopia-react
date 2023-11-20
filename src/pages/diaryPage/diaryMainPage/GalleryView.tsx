@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { DiaryProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
 
 import NoContent from './NoContent';
 import './galleryView.scss';
 
 interface GalleryViewProps {
-  diaryData: DiaryProps[] | undefined;
+  diaryData: Diary[] | undefined;
 }
 
 const GalleryView = ({ diaryData }: GalleryViewProps) => {

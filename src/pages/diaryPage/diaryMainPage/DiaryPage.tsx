@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DIARY_IMAGES } from '@/constants/diary';
-import { useAuth, useDiaryData, usePlantData } from '@/hooks';
+import { useAuth, useDiaryData } from '@/hooks';
 import { showAlert } from '@/utils/alarmUtil';
 
 import Header from '@/components/header/Header';
@@ -34,12 +34,13 @@ const DiaryPage = () => {
     data: diaryData,
     deleteDiaryItem,
     isLoading,
-    refetch,
+    refetch: diaryRefetch,
   } = useDiaryData(user);
-  const { data: plantData } = usePlantData(user);
 
   useEffect(() => {
-    user && refetch();
+    if (!user) return;
+
+    diaryRefetch();
   }, [user]);
 
   const handleTabChange = (tab: string) => {
@@ -49,7 +50,7 @@ const DiaryPage = () => {
   };
 
   const handleRedirect = async () => {
-    if (!plantData) {
+    if (!diaryData) {
       showAlert(
         '등록된 식물이 없습니다.',
         '내 식물을 등록하시겠습니까?',

@@ -12,7 +12,7 @@ import {
   addDoc,
   updateDoc,
 } from 'firebase/firestore';
-import { DiaryProps } from '@/@types/diary.type';
+import { Diary } from '@/@types/diary.type';
 import { successNoti } from '@/utils/alarmUtil';
 
 const getDiaryDocuments = async (user: User | undefined) => {
@@ -21,9 +21,9 @@ const getDiaryDocuments = async (user: User | undefined) => {
     where('userEmail', '==', user?.email),
   );
   const querySnapshot = await getDocs(q);
-  const data: DiaryProps[] = [];
+  const data: Diary[] = [];
   querySnapshot.forEach(doc => {
-    data.push({ id: doc.id, ...doc.data() } as DiaryProps);
+    data.push({ id: doc.id, ...doc.data() } as Diary);
   });
 
   return data;
@@ -32,7 +32,7 @@ const getDiaryDocuments = async (user: User | undefined) => {
 const useDiaryData = (user: User | undefined) => {
   const navigate = useNavigate();
   const { data, isLoading, refetch } = useQuery(
-    ['diary'],
+    ['diary', user?.email],
     () => getDiaryDocuments(user),
     {
       refetchOnWindowFocus: false,
@@ -45,14 +45,11 @@ const useDiaryData = (user: User | undefined) => {
     },
   );
 
-  const addDiaryItem = async (item: Partial<DiaryProps>) => {
+  const addDiaryItem = async (item: Partial<Diary>) => {
     await addDoc(collection(db, 'diary'), item);
   };
 
-  const updateDiaryItem = async (
-    diaryId: string,
-    item: Partial<DiaryProps>,
-  ) => {
+  const updateDiaryItem = async (diaryId: string, item: Partial<Diary>) => {
     const diaryRef = doc(db, 'diary', diaryId);
     await updateDoc(diaryRef, item);
   };

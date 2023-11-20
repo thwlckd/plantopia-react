@@ -1,7 +1,20 @@
+import { useEffect } from 'react';
 import { ARROW_IMAGES } from '@/constants/diary';
-import { SectionEditBoardProps } from '@/@types/diary.type';
+import { useAuth, usePlantData } from '@/hooks';
 
 import './sectionEditBoard.scss';
+
+interface SectionEditBoardProps {
+  title: string;
+  setTitle: (value: string) => void;
+  content: string;
+  setContent: (value: string) => void;
+  chosenPlants: string[];
+  handleChosenPlantClick: (plant: string) => void;
+  handlePlantSelection: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isVisible: boolean;
+  toggleSelect: () => void;
+}
 
 const SectionEditBoard = ({
   title,
@@ -13,8 +26,16 @@ const SectionEditBoard = ({
   handlePlantSelection,
   isVisible,
   toggleSelect,
-  plantTag,
 }: SectionEditBoardProps) => {
+  const user = useAuth();
+  const { data: plantData, refetch } = usePlantData(user);
+
+  useEffect(() => {
+    if (!user) return;
+
+    refetch();
+  }, [user]);
+
   return (
     <section className="board_section">
       <div className="title_wrapper">
@@ -26,7 +47,6 @@ const SectionEditBoard = ({
           onChange={e => setTitle(e.target.value)}
         />
       </div>
-
       <div className="plant_select_wrapper">
         <div className="plant_select">
           {chosenPlants.length === 0 ? (
@@ -48,17 +68,16 @@ const SectionEditBoard = ({
             </div>
           )}
           <div className="arrow_icon" onClick={toggleSelect}>
-            {isVisible ? (
-              <img src={ARROW_IMAGES.ARROW_UP} alt="Up" />
-            ) : (
-              <img src={ARROW_IMAGES.ARROW_DOWN} alt="Down" />
-            )}
+            <img
+              src={isVisible ? ARROW_IMAGES.ARROW_UP : ARROW_IMAGES.ARROW_DOWN}
+              alt={isVisible ? 'Up' : 'Down'}
+            />
           </div>
         </div>
         {isVisible && (
           <div className="plant_list">
             <ul>
-              {(plantTag || []).map(plant => (
+              {(plantData || []).map(plant => (
                 <li key={plant.nickname}>
                   <input
                     type="checkbox"

@@ -1,17 +1,47 @@
+import { useEffect } from 'react';
+import { useAuth, usePlantData } from '@/hooks';
 import { ARROW_IMAGES } from '@/constants/diary';
-import { SectionBoardProps } from '@/@types/diary.type';
 
-import './sectionBoard.scss';
+import './sectionWriteBoard.scss';
 
-const SectionBoard = ({
+interface SectionWriteBoardProps {
+  state: {
+    title: string;
+    content: string;
+    saving: boolean;
+    isVisible: boolean;
+  };
+  setState: React.Dispatch<
+    React.SetStateAction<{
+      title: string;
+      content: string;
+      saving: boolean;
+      isVisible: boolean;
+    }>
+  >;
+  chosenPlants: string[];
+  toggleSelect(): void;
+  handleChosenPlantClick(plant: string): void;
+  handlePlantSelection(event: React.ChangeEvent<HTMLInputElement>): void;
+}
+
+const SectionWriteBoard = ({
   state,
   setState,
   chosenPlants,
   toggleSelect,
   handleChosenPlantClick,
   handlePlantSelection,
-  plantTag,
-}: SectionBoardProps) => {
+}: SectionWriteBoardProps) => {
+  const user = useAuth();
+  const { data: plantData, refetch } = usePlantData(user);
+
+  useEffect(() => {
+    if (!user) return;
+
+    refetch();
+  }, [user]);
+
   return (
     <div className="section_board">
       <section className="board">
@@ -26,21 +56,13 @@ const SectionBoard = ({
             }
           />
         </div>
-
         <div className="plant_select_wrapper">
           <div className="plant_select">
-            {chosenPlants.length === 0 && (
-              <div
-                className={`choose_text ${
-                  chosenPlants.length === 0 ? '' : 'hide'
-                }`}
-                onClick={toggleSelect}
-              >
+            {chosenPlants.length === 0 ? (
+              <div className="choose_text" onClick={toggleSelect}>
                 식물을 선택하세요.
               </div>
-            )}
-
-            {chosenPlants.length > 0 && (
+            ) : (
               <div className="chosen_wrap">
                 {chosenPlants.map(plant => (
                   <div
@@ -65,33 +87,29 @@ const SectionBoard = ({
               />
             </div>
           </div>
-
           {state.isVisible && (
-            <>
-              <div className="plant_list">
-                <ul>
-                  {(plantTag || []).map(plant => (
-                    <li key={plant.nickname}>
-                      <input
-                        type="checkbox"
-                        name={plant.nickname}
-                        id={plant.nickname}
-                        value={plant.nickname}
-                        onChange={handlePlantSelection}
-                        checked={chosenPlants.includes(plant.nickname)}
-                      />
-                      <label htmlFor={plant.nickname}>{plant.nickname}</label>
-                    </li>
-                  ))}
-                </ul>
-                <button className="choose_complete" onClick={toggleSelect}>
-                  선택 완료
-                </button>
-              </div>
-            </>
+            <div className="plant_list">
+              <ul>
+                {(plantData || []).map(plant => (
+                  <li key={plant.nickname}>
+                    <input
+                      type="checkbox"
+                      name={plant.nickname}
+                      id={plant.nickname}
+                      value={plant.nickname}
+                      onChange={handlePlantSelection}
+                      checked={chosenPlants.includes(plant.nickname)}
+                    />
+                    <label htmlFor={plant.nickname}>{plant.nickname}</label>
+                  </li>
+                ))}
+              </ul>
+              <button className="choose_complete" onClick={toggleSelect}>
+                선택 완료
+              </button>
+            </div>
           )}
         </div>
-
         <textarea
           placeholder="내용을 작성하세요."
           value={state.content}
@@ -105,4 +123,4 @@ const SectionBoard = ({
   );
 };
 
-export default SectionBoard;
+export default SectionWriteBoard;
