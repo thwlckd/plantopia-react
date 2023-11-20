@@ -7,24 +7,20 @@ import { Navigation, Pagination } from 'swiper/modules';
 import { db } from '@/firebaseApp';
 import { doc, getDoc } from 'firebase/firestore';
 import useDiaryData from '@/hooks/useDiaryData';
-import HeaderBefore from '@/components/headerBefore/HeaderBefore';
 
+import HeaderBefore from '@/components/headerBefore/HeaderBefore';
+import NotFoundPage from '@/pages/notFoundPage/NotFoundPage';
 import './diaryDetailPage.scss';
 
 const DiaryDetailPage = () => {
   const { docId } = useParams();
-  if (!docId) {
-    return null;
-  }
-  const { handleDelete } = useDiaryData();
-
   const slideSectionPrevBtn = useRef<HTMLDivElement>(null);
   const slideSectionNextBtn = useRef<HTMLDivElement>(null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [diaryDetailData, setDiaryDetailData] = useState<DiaryProps | null>(
     null,
   );
+  const { handleDelete } = useDiaryData();
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -39,6 +35,7 @@ const DiaryDetailPage = () => {
 
   useEffect(() => {
     const fetchDiaryDetailData = async () => {
+      if (!docId) return;
       const docRef = doc(db, 'diary', docId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -49,21 +46,9 @@ const DiaryDetailPage = () => {
     fetchDiaryDetailData();
   }, [docId]);
 
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      const targetElement = event.target as HTMLElement;
-
-      if (isModalOpen && !targetElement.closest('.more_btn_wrap')) {
-        setIsModalOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleOutsideClick);
-
-    return () => {
-      document.removeEventListener('click', handleOutsideClick);
-    };
-  }, [isModalOpen]);
+  if (!docId) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="diary_detail_wrap layout">

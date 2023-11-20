@@ -1,4 +1,4 @@
-import { ArrowImages } from '@/constants/diary';
+import { ARROW_IMAGES } from '@/constants/diary';
 import { SectionBoardProps } from '@/@types/diary.type';
 
 import './sectionBoard.scss';
@@ -58,8 +58,8 @@ const SectionBoard = ({
               <img
                 src={
                   state.isVisible
-                    ? ArrowImages.ARROW_UP
-                    : ArrowImages.ARROW_DOWN
+                    ? ARROW_IMAGES.ARROW_UP
+                    : ARROW_IMAGES.ARROW_DOWN
                 }
                 alt={state.isVisible ? 'Up' : 'Down'}
               />

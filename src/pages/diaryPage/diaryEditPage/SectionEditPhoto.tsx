@@ -18,11 +18,11 @@ interface EditPhotoProps {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const SectionEditPhoto: React.FC<EditPhotoProps> = ({
+const SectionEditPhoto = ({
   imgUrls,
   setImgUrls,
   setIsLoading,
-}) => {
+}: EditPhotoProps) => {
   const [previewImgs, setPreviewImgs] = useState<{ backgroundImage: string }[]>(
     [],
   );

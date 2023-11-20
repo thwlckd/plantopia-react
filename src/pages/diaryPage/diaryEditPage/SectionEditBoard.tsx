@@ -1,4 +1,4 @@
-import { ArrowImages } from '@/constants/diary';
+import { ARROW_IMAGES } from '@/constants/diary';
 import { SectionEditBoardProps } from '@/@types/diary.type';
 
 import './sectionEditBoard.scss';
@@ -49,35 +49,33 @@ const SectionEditBoard = ({
           )}
           <div className="arrow_icon" onClick={toggleSelect}>
             {isVisible ? (
-              <img src={ArrowImages.ARROW_UP} alt="Up" />
+              <img src={ARROW_IMAGES.ARROW_UP} alt="Up" />
             ) : (
-              <img src={ArrowImages.ARROW_DOWN} alt="Down" />
+              <img src={ARROW_IMAGES.ARROW_DOWN} alt="Down" />
             )}
           </div>
         </div>
         {isVisible && (
-          <>
-            <div className="plant_list">
-              <ul>
-                {(plantTag || []).map(plant => (
-                  <li key={plant.nickname}>
-                    <input
-                      type="checkbox"
-                      name={plant.nickname}
-                      id={plant.nickname}
-                      value={plant.nickname}
-                      onChange={handlePlantSelection}
-                      checked={chosenPlants.includes(plant.nickname)}
-                    />
-                    <label htmlFor={plant.nickname}>{plant.nickname}</label>
-                  </li>
-                ))}
-              </ul>
-              <button className="choose_complete" onClick={toggleSelect}>
-                선택 완료
-              </button>
-            </div>
-          </>
+          <div className="plant_list">
+            <ul>
+              {(plantTag || []).map(plant => (
+                <li key={plant.nickname}>
+                  <input
+                    type="checkbox"
+                    name={plant.nickname}
+                    id={plant.nickname}
+                    value={plant.nickname}
+                    onChange={handlePlantSelection}
+                    checked={chosenPlants.includes(plant.nickname)}
+                  />
+                  <label htmlFor={plant.nickname}>{plant.nickname}</label>
+                </li>
+              ))}
+            </ul>
+            <button className="choose_complete" onClick={toggleSelect}>
+              선택 완료
+            </button>
+          </div>
         )}
       </div>
 

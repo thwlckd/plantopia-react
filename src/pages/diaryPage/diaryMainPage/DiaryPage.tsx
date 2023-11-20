@@ -1,16 +1,31 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DiaryImages } from '@/constants/diary';
+import { DIARY_IMAGES } from '@/constants/diary';
 import { useAuth } from '@/hooks';
 import { showAlert } from '@/utils/alarmUtil';
 import useDiaryData from '@/hooks/useDiaryData';
+
 import Header from '@/components/header/Header';
 import Footer from '@/components/footer/Footer';
 import Progress from '@/components/progress/Progress';
-
 import ListView from './ListView';
 import GalleryView from './GalleryView';
 import './diaryPage.scss';
+
+const TAB_DATA = [
+  {
+    name: 'list_tab',
+    label: 'List',
+    onImage: DIARY_IMAGES.LISTON,
+    offImage: DIARY_IMAGES.LISTOFF,
+  },
+  {
+    name: 'gallery_tab',
+    label: 'Gallery',
+    onImage: DIARY_IMAGES.GALLERYON,
+    offImage: DIARY_IMAGES.GALLERYOFF,
+  },
+];
 
 const DiaryPage = () => {
   const user = useAuth();
@@ -25,22 +40,7 @@ const DiaryPage = () => {
     }
   };
 
-  const tabData = [
-    {
-      name: 'list_tab',
-      label: 'List',
-      onImage: DiaryImages.LISTON,
-      offImage: DiaryImages.LISTOFF,
-    },
-    {
-      name: 'gallery_tab',
-      label: 'Gallery',
-      onImage: DiaryImages.GALLERYON,
-      offImage: DiaryImages.GALLERYOFF,
-    },
-  ];
-
-  const redirectToPage = async () => {
+  const handleRedirect = async () => {
     const plantExists = await checkPlantExistence();
     if (!plantExists) {
       showAlert(
@@ -66,7 +66,7 @@ const DiaryPage = () => {
             <span className="plant_icon"></span>
           </h2>
           <section className="tab_section">
-            {tabData.map((tab, index) => (
+            {TAB_DATA.map((tab, index) => (
               <div
                 key={index}
                 className={`view_tab ${tab.name} ${
@@ -78,7 +78,7 @@ const DiaryPage = () => {
                   src={currentTab === tab.name ? tab.onImage : tab.offImage}
                   className="tab_img"
                   alt={`Tab ${tab.label}`}
-                ></img>
+                />
               </div>
             ))}
           </section>
@@ -91,7 +91,7 @@ const DiaryPage = () => {
           </section>
           <div className="top_btn"></div>
         </div>
-        <button onClick={redirectToPage} className="write_btn_wrap">
+        <button onClick={handleRedirect} className="write_btn_wrap">
           <div className="write_btn"></div>
         </button>
       </main>

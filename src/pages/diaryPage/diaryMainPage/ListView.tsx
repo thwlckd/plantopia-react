@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DiaryProps, ListViewProps } from '@/@types/diary.type';
-import NoContent from './NoContent';
 import { showAlert } from '@/utils/alarmUtil';
+
+import NoContent from './NoContent';
 import './listView.scss';
 
-const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
+const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDiary, setSelectedDiary] = useState<DiaryProps | null>(null);
 
-  const toggleModal = (diary: DiaryProps) => {
+  const handleToggleModal = (e: React.MouseEvent, diary: DiaryProps) => {
+    e.stopPropagation();
+
     setSelectedDiary(diary);
     setIsModalOpen(!isModalOpen);
   };
@@ -23,23 +27,6 @@ const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
     navigate(`/diary/${diary.id}/edit`);
     closeModal();
   };
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.more_modal')) {
-        setIsModalOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="list_view">
@@ -72,10 +59,7 @@ const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
               </Link>
               <button
                 className="more"
-                onClick={event => {
-                  event.stopPropagation();
-                  toggleModal(diary);
-                }}
+                onClick={e => handleToggleModal(e, diary)}
               ></button>
               {isModalOpen && selectedDiary === diary && (
                 <div className="more_modal">

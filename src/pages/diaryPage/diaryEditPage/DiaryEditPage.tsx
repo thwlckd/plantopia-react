@@ -1,31 +1,29 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useDiaryData from '@/hooks/useDiaryData';
-import HeaderBefore from '@/components/headerBefore/HeaderBefore';
 import { DiaryProps } from '@/@types/diary.type';
-import SectionEditPhoto from './SectionEditPhoto';
-import SectionEditBoard from './SectionEditBoard';
 import { errorNoti, successNoti } from '@/utils/alarmUtil';
+
+import HeaderBefore from '@/components/headerBefore/HeaderBefore';
+import SectionEditBoard from './SectionEditBoard';
+import SectionEditPhoto from './SectionEditPhoto';
+import NotFoundPage from '@/pages/notFoundPage/NotFoundPage';
 import './diaryEditPage.scss';
 
 const DiaryEditPage = () => {
   const { docId } = useParams();
-  if (!docId) {
-    return;
-  }
-  const { diaryData, updateDiaryData, isLoading, setIsLoading, plantTag } =
-    useDiaryData();
   const navigate = useNavigate();
-
-  const diaryToUpdate = diaryData.find(
-    (diary: DiaryProps) => diary.id === docId,
-  );
-
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [chosenPlants, setChosenPlants] = useState<string[]>([]);
   const [imgUrls, setImgUrls] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
+  const { diaryData, updateDiaryData, isLoading, setIsLoading, plantTag } =
+    useDiaryData();
+
+  const diaryToUpdate = diaryData.find(
+    (diary: DiaryProps) => diary.id === docId,
+  );
 
   useEffect(() => {
     if (!diaryToUpdate) {
@@ -69,18 +67,21 @@ const DiaryEditPage = () => {
     }
 
     setIsLoading(true);
-
+    if (!docId) return;
     await updateDiaryData(docId, {
       content: content,
       tags: chosenPlants,
       title: title,
       imgUrls: imgUrls,
     });
-
     setIsLoading(false);
     successNoti('수정이 완료되었어요!');
     navigate('/diary');
   };
+
+  if (!docId) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="layout">
