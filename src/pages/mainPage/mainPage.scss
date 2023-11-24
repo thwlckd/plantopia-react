@@ -1,5 +1,6 @@
 @use '@/styles/mixins';
 @use 'swiper/scss';
+@use 'react-loading-skeleton/dist/skeleton.css';
 
 .main_page {
   min-height: 100vh;
@@ -90,6 +91,14 @@
   .weather_icon {
     width: 10rem;
     height: 10rem;
+  }
+
+  .line_skeleton {
+    margin-bottom: 1rem;
+  }
+
+  .img_skeleton {
+    margin-right: 3rem;
   }
 }
 
