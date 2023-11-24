@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks';
 import WATERING from '@/assets/images/icons/watering.png';
 import MAIN_PLANT from '@/assets/images/plants/main_plant.png';
 import EDIT_ICON from '@/assets/images/icons/my_plant_detail_edit_icon.png';
+
 interface MainPlantProps {
   plant?: UserPlant;
   onWaterPlant: (plantId: string) => void;
@@ -36,7 +37,6 @@ const EmptyPlant = () => {
 
 const MainPlantSection = ({ plant, onWaterPlant }: MainPlantProps) => {
   if (!plant) return <EmptyPlant />;
-
   const calcWateringDday = (
     lastWateringDate: number,
     frequency: number,
@@ -47,8 +47,8 @@ const MainPlantSection = ({ plant, onWaterPlant }: MainPlantProps) => {
     return diffDays >= 0 ? 0 : Math.abs(diffDays);
   };
 
-  const onClickWatering = (event: React.MouseEvent<HTMLElement>) => {
-    event.preventDefault();
+  const onClickWatering = (e: React.MouseEvent) => {
+    e.preventDefault();
 
     showAlert('식물에 물을 주시겠습니까?', '', () => onWaterPlant(plant.id));
   };
@@ -73,7 +73,6 @@ const MainPlantSection = ({ plant, onWaterPlant }: MainPlantProps) => {
           <div className="watering_label">물주기</div>
         </button>
       </Link>
-      {/* main_plant_info */}
       <div className="main_plant_info">
         <div className="eng_name_label">{plant.plantName}</div>
         <h2 className="nickname">

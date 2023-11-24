@@ -1,8 +1,16 @@
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { User } from 'firebase/auth';
-import { getDocs, query, where, collection } from 'firebase/firestore';
+import {
+  getDocs,
+  query,
+  where,
+  collection,
+  doc,
+  updateDoc,
+} from 'firebase/firestore';
 import { db } from '../firebaseApp';
 import { UserPlant } from '@/@types/plant.type';
+import { successNoti } from '@/utils/alarmUtil';
 
 const getPlantDocuments = async (user: User | undefined) => {
   const q = query(
@@ -10,11 +18,19 @@ const getPlantDocuments = async (user: User | undefined) => {
     where('userEmail', '==', user?.email),
   );
   const querySnapshot = await getDocs(q);
-  const data: UserPlant[] = querySnapshot.docs.map(
-    doc => doc.data() as UserPlant,
-  );
+  const data: UserPlant[] = querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...(doc.data() as Omit<UserPlant, 'id'>),
+  }));
 
   return data;
+};
+
+const updatePlantInfo = (plant: UserPlant) => {
+  const { id, ...newData } = plant;
+  const plantRef = doc(db, 'plant', id);
+
+  return updateDoc(plantRef, newData);
 };
 
 const usePlantData = (user: User | undefined) => {
@@ -27,7 +43,13 @@ const usePlantData = (user: User | undefined) => {
     },
   );
 
-  return { data, isLoading, refetch };
+  const { mutate } = useMutation(updatePlantInfo, {
+    onSuccess() {
+      successNoti('물을 잘 먹었어요!');
+    },
+  });
+
+  return { data, isLoading, refetch, mutate };
 };
 
 export default usePlantData;
