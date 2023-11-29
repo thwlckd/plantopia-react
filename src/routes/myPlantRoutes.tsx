@@ -1,8 +1,6 @@
 import { lazy } from 'react';
 
-const MyPlantMainPage = lazy(
-  () => import('@/pages/myPlantPage/myPlantMainPage/MyPlantMainPage'),
-);
+const MyPlantPage = lazy(() => import('@/pages/myPlantPage/MyPlantPage'));
 const MyPlantDetailPage = lazy(
   () => import('@/pages/myPlantPage/myPlantDetailPage/MyPlantDetailPage'),
 );
@@ -14,7 +12,7 @@ const MyPlantEditPage = lazy(
 );
 
 const myPlantRoutes = [
-  { path: '/myplant', element: <MyPlantMainPage /> },
+  { path: '/myplant', element: <MyPlantPage /> },
   { path: '/myplant/:docId', element: <MyPlantDetailPage /> },
   { path: '/myplant/:docId/edit', element: <MyPlantEditPage /> },
   { path: '/myplant/register', element: <MyPlantRegisterPage /> },

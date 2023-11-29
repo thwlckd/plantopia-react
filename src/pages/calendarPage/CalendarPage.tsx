@@ -71,7 +71,7 @@ const CalendarPage = () => {
   const { data, isLoading, refetch } = usePlantData(user);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user) return;
 
     refetch();
 
@@ -89,7 +89,6 @@ const CalendarPage = () => {
 
     items.forEach(({ nickname, wateredDays }) => {
       wateredDays.forEach(date => {
-        console.log(typeof date);
         const time = format(date.toDate(), 'HH:mm');
         const fullDate = format(date.toDate(), 'yyyy-MM-dd');
 
