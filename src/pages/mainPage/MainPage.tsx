@@ -10,6 +10,7 @@ import Footer from '@/components/footer/Footer';
 import Progress from '@/components/progress/Progress';
 import MainPlantSection from './MainPlantSection';
 import WeatherSection from './WeatherSection';
+import { successNoti } from '@/utils/alarmUtil';
 import './mainPage.scss';
 
 interface PlantListProps {
@@ -60,6 +61,7 @@ const MainPage = () => {
         Timestamp.fromDate(new Date()),
       ],
     });
+
     setFocusPlant({
       ...toUpdateData,
       wateredDays: [
@@ -67,6 +69,8 @@ const MainPage = () => {
         Timestamp.fromDate(new Date()),
       ],
     });
+
+    successNoti('물을 잘 먹었어요!');
   };
 
   return (

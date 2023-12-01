@@ -10,7 +10,6 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebaseApp';
 import { UserPlant } from '@/@types/plant.type';
-import { successNoti } from '@/utils/alarmUtil';
 
 const getPlantDocuments = async (user: User | undefined) => {
   const q = query(
@@ -43,11 +42,7 @@ const usePlantData = (user: User | undefined) => {
     },
   );
 
-  const { mutate } = useMutation(updatePlantInfo, {
-    onSuccess() {
-      successNoti('물을 잘 먹었어요!');
-    },
-  });
+  const { mutate } = useMutation(updatePlantInfo);
 
   return { data, isLoading, refetch, mutate };
 };

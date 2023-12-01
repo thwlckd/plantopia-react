@@ -1,63 +1,47 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
-import { db } from '@/firebaseApp';
-import { getDocs, collection, where, query } from 'firebase/firestore';
-import './myPlantMainPage.scss';
-import Header from '@/components/header/Header';
-import Footer from '@/components/footer/Footer';
-import Progress from '@/components/progress/Progress';
-import plusIcon from '@/assets/images/icons/ph_plus-light.png';
-import MainPagePlantList from '@/pages/myPlantPage/MainPagePlantList';
+import { useAuth, usePlantData } from '@/hooks';
+
 import editIcon from '@/assets/images/icons/my_plant_detail_edit_icon.png';
 import samplePlant from '@/assets/images/icons/sample_plant1.png';
 import mainPlantTrueIcon from '@/assets/images/icons/main_plant_true_icon.png';
-import { infoNoti } from '@/utils/alarmUtil';
+import plusIcon from '@/assets/images/icons/ph_plus-light.png';
+import Header from '@/components/header/Header';
+import Footer from '@/components/footer/Footer';
+import Progress from '@/components/progress/Progress';
+import PlantList from '@/pages/myPlantPage/PlantList';
 import { UserPlant } from '@/@types/plant.type';
+import './myPlantPage.scss';
 
-const MyPlantMainPage = () => {
+const MyPlantPage = () => {
   const user = useAuth();
-  const [myMainPlant, setMyMainPlant] = useState<UserPlant>();
-  const [plantCount, setPlantCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const navigateRegi = () => {
-    if (plantCount >= 10) {
-      infoNoti('식물 등록은 10개까지 가능합니다.');
-      return;
-    }
-    navigate('/myplant/register');
-  };
+  const [mainPlant, setMainPlant] = useState<UserPlant>();
+
+  const { data, isLoading, refetch, mutate } = usePlantData(user);
 
   useEffect(() => {
-    const getQuerySnapshot = async () => {
-      if (user?.email) {
-        const q = query(
-          collection(db, 'plant'),
-          where('userEmail', '==', user?.email),
-          where('isMain', '==', true),
-        );
-        const mainData = (await getDocs(q)).docs[0]?.data();
-        setMyMainPlant(mainData as UserPlant);
-      }
-    };
-    getQuerySnapshot();
-  }, [user]);
+    if (!user) return;
+
+    refetch();
+    setMainPlant(() => data?.find(({ isMain }) => isMain));
+  }, [user, isLoading]);
+
   return (
     <div className="layout">
       <Header />
       <main className="my_plant_wrapper">
         <h2 className="my_plant_info_message">
-          <span className="username">{user?.displayName}</span>님의 식물을
-          한 눈에 보기!
+          <span className="username">{user?.displayName}</span>님의 식물을 한
+          눈에 보기!
         </h2>
         <div className="main_plant_info_box inner">
-          {myMainPlant ? (
+          {mainPlant ? (
             <div className="main_plant_main_data">
               <span>
                 <img
                   className="main_plant_img"
-                  src={myMainPlant?.imgUrl}
+                  src={mainPlant?.imgUrl}
                   alt="mainPlantImg"
                 />
               </span>
@@ -65,9 +49,12 @@ const MyPlantMainPage = () => {
                 <img src={mainPlantTrueIcon} alt="" />{' '}
                 <p className="main_plant_title">메인 식물</p>
               </div>
-              <p className="main_plant_name">{myMainPlant?.plantName}</p>
-              <p className="main_plant_nickname">{myMainPlant?.nickname}</p>
-              <p className="plant_plus_btn" onClick={navigateRegi}>
+              <p className="main_plant_name">{mainPlant?.plantName}</p>
+              <p className="main_plant_nickname">{mainPlant?.nickname}</p>
+              <p
+                className="plant_plus_btn"
+                onClick={() => navigate('/myplant/register')}
+              >
                 <img
                   src={plusIcon}
                   alt="plusIcon"
@@ -85,7 +72,7 @@ const MyPlantMainPage = () => {
               />
               <button
                 className="my_plant_main_add_btn_inner_contents"
-                onClick={navigateRegi}
+                onClick={() => navigate('/myplant/register')}
               >
                 <div className="my_plant_main_add_btn_inner_contents_box">
                   <img src={editIcon} alt="editIcon" />
@@ -95,11 +82,11 @@ const MyPlantMainPage = () => {
             </div>
           )}
           {user?.email && (
-            <MainPagePlantList
-              userEmail={user.email}
-              setMyMainPlant={setMyMainPlant}
-              setPlantCount={setPlantCount}
-              setIsLoading={setIsLoading}
+            <PlantList
+              plantData={data || undefined}
+              setMainPlant={setMainPlant}
+              updateMainPlant={mutate}
+              refetch={refetch}
             />
           )}
         </div>
@@ -110,4 +97,4 @@ const MyPlantMainPage = () => {
   );
 };
 
-export default MyPlantMainPage;
+export default MyPlantPage;
