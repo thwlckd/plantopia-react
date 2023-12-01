@@ -1,33 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useDiaryData from '@/hooks/useDiaryData';
-import HeaderBefore from '@/components/headerBefore/HeaderBefore';
-import { DiaryProps } from '@/@types/diary.type';
-import SectionEditPhoto from './SectionEditPhoto';
-import SectionEditBoard from './SectionEditBoard';
+import { Diary } from '@/@types/diary.type';
 import { errorNoti, successNoti } from '@/utils/alarmUtil';
+import { useAuth } from '@/hooks';
+
+import HeaderBefore from '@/components/headerBefore/HeaderBefore';
+import SectionEditBoard from './SectionEditBoard';
+import SectionEditPhoto from './SectionEditPhoto';
+import NotFoundPage from '@/pages/notFoundPage/NotFoundPage';
 import './diaryEditPage.scss';
 
 const DiaryEditPage = () => {
+  const user = useAuth();
   const { docId } = useParams();
-  if (!docId) {
-    return;
-  }
-  const { diaryData, updateDiaryData, isLoading, setIsLoading, plantTag } =
-    useDiaryData();
   const navigate = useNavigate();
-
-  const diaryToUpdate = diaryData.find(
-    (diary: DiaryProps) => diary.id === docId,
-  );
-
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [chosenPlants, setChosenPlants] = useState<string[]>([]);
   const [imgUrls, setImgUrls] = useState<string[]>([]);
   const [isVisible, setIsVisible] = useState(false);
+  const {
+    data: diaryData,
+    updateDiaryItem,
+    isLoading,
+    refetch: diaryRefetch,
+  } = useDiaryData(user);
 
   useEffect(() => {
+    if (!user) return;
+
+    diaryRefetch();
+  }, [user]);
+
+  useEffect(() => {
+    const diaryToUpdate = diaryData?.find((diary: Diary) => diary.id === docId);
     if (!diaryToUpdate) {
       return;
     }
@@ -36,7 +43,7 @@ const DiaryEditPage = () => {
     setContent(diaryToUpdate.content);
     setChosenPlants(diaryToUpdate.tags);
     setImgUrls(diaryToUpdate.imgUrls);
-  }, [diaryToUpdate]);
+  }, [diaryData]);
 
   const toggleSelect = () => {
     setIsVisible(prevVisible => !prevVisible);
@@ -68,30 +75,26 @@ const DiaryEditPage = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    await updateDiaryData(docId, {
+    if (!docId) return;
+    await updateDiaryItem(docId, {
       content: content,
       tags: chosenPlants,
       title: title,
       imgUrls: imgUrls,
     });
-
-    setIsLoading(false);
     successNoti('수정이 완료되었어요!');
     navigate('/diary');
   };
+
+  if (!docId) {
+    return <NotFoundPage />;
+  }
 
   return (
     <div className="layout">
       <HeaderBefore ex={true} title="수정하기" />
       <main className="diary_write_wrap">
-        <SectionEditPhoto
-          imgUrls={imgUrls}
-          setImgUrls={setImgUrls}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-        />
+        <SectionEditPhoto imgUrls={imgUrls} setImgUrls={setImgUrls} />
         <SectionEditBoard
           title={title}
           setTitle={setTitle}
@@ -102,7 +105,6 @@ const DiaryEditPage = () => {
           handlePlantSelection={handlePlantSelection}
           isVisible={isVisible}
           toggleSelect={toggleSelect}
-          plantTag={plantTag}
         />
         <button
           className="save_button"

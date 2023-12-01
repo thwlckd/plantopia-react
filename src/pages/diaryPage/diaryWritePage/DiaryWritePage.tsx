@@ -3,27 +3,31 @@ import { useNavigate } from 'react-router-dom';
 import { Timestamp } from 'firebase/firestore';
 import { useAuth } from '@/hooks';
 import useDiaryData from '@/hooks/useDiaryData';
-import HeaderBefore from '@/components/headerBefore/HeaderBefore';
-import SectionPhoto from './SectionPhoto';
-import SectionBoard from './SectionBoard';
 import { errorNoti, successNoti } from '@/utils/alarmUtil';
+
+import HeaderBefore from '@/components/headerBefore/HeaderBefore';
+import SectionPhoto from './SectionWritePhoto';
+import SectionBoard from './SectionWriteBoard';
 import './diaryWritePage.scss';
 
 const DiaryWritePage = () => {
   const user = useAuth();
-  const userEmail = user?.email || '';
-  const { saveDiaryData, plantTag } = useDiaryData();
   const navigate = useNavigate();
-
   const [state, setState] = useState({
     title: '',
     content: '',
     saving: false,
     isVisible: false,
   });
-
   const [chosenPlants, setChosenPlants] = useState<string[]>([]);
   const [imgUrls, setImgUrls] = useState<string[]>([]);
+  const { addDiaryItem, refetch: diaryRefetch } = useDiaryData(user);
+
+  useEffect(() => {
+    if (!user) return;
+
+    diaryRefetch();
+  }, [user]);
 
   const toggleSelect = () =>
     setState(prevState => ({ ...prevState, isVisible: !prevState.isVisible }));
@@ -57,8 +61,8 @@ const DiaryWritePage = () => {
 
     setState(prev => ({ ...prev, saving: true }));
 
-    await saveDiaryData({
-      userEmail,
+    await addDiaryItem({
+      userEmail: user?.email || '',
       content,
       postedAt: Timestamp.now(),
       tags: chosenPlants,
@@ -91,11 +95,7 @@ const DiaryWritePage = () => {
     <div className="layout">
       <HeaderBefore ex={true} title="글쓰기" />
       <main className="diary_main">
-        <SectionPhoto
-          userEmail={userEmail}
-          imgUrls={imgUrls}
-          setImgUrls={setImgUrls}
-        />
+        <SectionPhoto imgUrls={imgUrls} setImgUrls={setImgUrls} />
         <SectionBoard
           state={state}
           setState={setState}
@@ -103,7 +103,6 @@ const DiaryWritePage = () => {
           toggleSelect={toggleSelect}
           handleChosenPlantClick={handleChosenPlantClick}
           handlePlantSelection={handlePlantSelection}
-          plantTag={plantTag}
         />
       </main>
       <button

@@ -1,6 +1,7 @@
+import { useQuery } from 'react-query';
 import axios, { AxiosResponse } from 'axios';
 import { WeatherResponse } from '@/@types/weather.type';
-import { Coordinates } from '@/utils/getGeolocation';
+import { Coordinates, getGeolocation } from '@/utils/getGeolocation';
 
 const fetchWeatherInfo = ({
   latitude,
@@ -19,4 +20,20 @@ const fetchWeatherInfo = ({
   return instance.get('weather');
 };
 
-export { fetchWeatherInfo };
+const useWeatherData = () => {
+  const { data, isLoading } = useQuery(
+    ['weather'],
+    async () => {
+      const coor = await getGeolocation();
+      return fetchWeatherInfo(coor);
+    },
+    {
+      staleTime: 600000,
+      refetchOnWindowFocus: false,
+    },
+  );
+
+  return { data, isLoading };
+};
+
+export default useWeatherData;
