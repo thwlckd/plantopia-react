@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { DiaryProps, ListViewProps } from '@/@types/diary.type';
-import NoContent from './NoContent';
+import { Diary } from '@/@types/diary.type';
 import { showAlert } from '@/utils/alarmUtil';
+
+import NoContent from './NoContent';
 import './listView.scss';
 
-const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedDiary, setSelectedDiary] = useState<DiaryProps | null>(null);
+interface ListViewProps {
+  diaryData: Diary[] | undefined;
+  handleDelete: (diaryId: string) => void;
+}
 
-  const toggleModal = (diary: DiaryProps) => {
+const ListView = ({ diaryData, handleDelete }: ListViewProps) => {
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDiary, setSelectedDiary] = useState<Diary | null>(null);
+
+  const handleToggleModal = (diary: Diary) => {
     setSelectedDiary(diary);
     setIsModalOpen(!isModalOpen);
   };
@@ -19,35 +26,16 @@ const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
     setIsModalOpen(false);
   };
 
-  const navigateToEdit = (diary: DiaryProps) => {
+  const navigateToEdit = (diary: Diary) => {
     navigate(`/diary/${diary.id}/edit`);
     closeModal();
   };
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (!target.closest('.more_modal')) {
-        setIsModalOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
-
   return (
     <div className="list_view">
-      {diaryData.length === 0 ? (
-        <NoContent />
-      ) : (
-        <ul className="diary_list_wrap">
-          {diaryData.map(diary => (
+      <ul className="diary_list_wrap">
+        {diaryData ? (
+          diaryData.map(diary => (
             <li className="diary_list" key={diary.id}>
               <Link to={`/diary/${diary.id}`}>
                 <div className="left_box">
@@ -72,10 +60,7 @@ const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
               </Link>
               <button
                 className="more"
-                onClick={event => {
-                  event.stopPropagation();
-                  toggleModal(diary);
-                }}
+                onClick={() => handleToggleModal(diary)}
               ></button>
               {isModalOpen && selectedDiary === diary && (
                 <div className="more_modal">
@@ -99,9 +84,11 @@ const ListView: React.FC<ListViewProps> = ({ diaryData, handleDelete }) => {
                 </div>
               )}
             </li>
-          ))}
-        </ul>
-      )}
+          ))
+        ) : (
+          <NoContent />
+        )}
+      </ul>
     </div>
   );
 };

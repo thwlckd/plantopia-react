@@ -2,19 +2,17 @@ import { useEffect, useState, useCallback } from 'react';
 import Calendar from 'react-calendar';
 import { nanoid } from 'nanoid';
 import { format, getDay } from 'date-fns';
-import { useAuth } from '@/hooks';
+import { useAuth, usePlantData } from '@/hooks';
 import { CALENDAR_ICONS, DAY_OF_WEEK_KR } from '@/constants/calendar';
 import { UserPlant } from '@/@types/plant.type';
 import { TileArgs } from 'node_modules/react-calendar/dist/esm/shared/types';
-import { errorNoti } from '@/utils/alarmUtil';
 
 import Progress from '@/components/progress/Progress';
 import HeaderBefore from '@/components/headerBefore/HeaderBefore';
-
 import './calendarPage.scss';
-import { getPlantList } from '@/api/userPlant';
 
 type ValuePiece = Date | null;
+
 interface RecordDataType {
   time: string;
   plantName: string;
@@ -68,9 +66,17 @@ const ContentSection = ({ contents, selectedDate }: ContentSectionProps) => {
 
 const CalendarPage = () => {
   const user = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<ValuePiece>(new Date());
   const [calendarData, setCalendarData] = useState<CalendarDataType>({});
+  const { data, isLoading, refetch } = usePlantData(user);
+
+  useEffect(() => {
+    if (!user) return;
+
+    refetch();
+
+    data && setCalendarData(formatCalendarData(data));
+  }, [user]);
 
   const setIconOnTile = ({ date }: TileArgs) => {
     const dateMatchedItem = calendarData[format(date, 'yyyy-MM-dd')];
@@ -118,28 +124,12 @@ const CalendarPage = () => {
     return calendarData;
   };
 
-  useEffect(() => {
-    (async () => {
-      if (!user?.email) return;
-
-      try {
-        const userPlants = await getPlantList(user?.email);
-        const calendarData = formatCalendarData(userPlants);
-        setCalendarData(calendarData);
-      } catch (error) {
-        errorNoti('데이터를 받아오지 못했습니다! 잠시 후 다시 시도해주세요!');
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, [user]);
-
   const visibleContent = selectedDate
     ? calendarData[format(selectedDate, 'yyyy-MM-dd')]
     : null;
 
   return (
-    <div className ="layout">
+    <div className="layout">
       <HeaderBefore ex={true} title="물주기 기록" />
       <main className="calendar_page">
         <section className="calendar_wrap inner">
